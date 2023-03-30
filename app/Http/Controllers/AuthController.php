@@ -4,24 +4,42 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\AuthLoginRequest;
 use App\Http\Requests\Auth\AuthRegisterRequest;
-use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\User;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function __construct()
+    public function register(AuthRegisterRequest $request)
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        // $token = Auth::login($user);
+
+        $token = auth()->attempt($request->only('email', 'password'));
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User created successfully',
+            'user' => $user,
+            'authorization' => [
+                'token' => $token,
+                'type' => 'bearer',
+            ]
+        ]);
     }
 
-    public function login (AuthLoginRequest $request)
+    public function login(AuthLoginRequest $request)
     {
-        $request->validated();
+
         $credentials = $request->only('email', 'password');
 
-        $token = Auth::attempt($credentials);
+        $token = auth()->attempt($credentials);
         if (!$token) {
             return response()->json([
                 'status' => 'error',
@@ -32,27 +50,6 @@ class AuthController extends Controller
         $user = Auth::user();
         return response()->json([
             'status' => 'success',
-            'user' => $user,
-            'authorization' => [
-                'token' => $token,
-                'type' => 'bearer',
-            ]
-            ]);
-    }
-
-    public function register(AuthRegisterRequest $request){
-        $request->validated();
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        $token = Auth::login($user);
-        return response()->json([
-            'status' => 'success',
-            'message' => 'User created successfully',
             'user' => $user,
             'authorization' => [
                 'token' => $token,
