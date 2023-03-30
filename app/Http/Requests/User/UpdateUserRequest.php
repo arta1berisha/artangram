@@ -11,7 +11,7 @@ class UpdateUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,29 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:users',
+            ],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'unique:users',
+            ],
+            'password' => [
+                'required',
+                'string',
+                'max:255',
+                'min:7'
+            ],
         ];
     }
 }
