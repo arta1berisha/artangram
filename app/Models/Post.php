@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Post extends Model
 {
@@ -11,13 +12,23 @@ class Post extends Model
 
     protected $fillable = [];
 
-    public function users()
+    public function posts()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsTo(Post::class)->orderBy('created_at', 'DESC');
     }
     
-    public function comments()
+    public function comments() 
     {
-        return $this->belongsTo(Comment::class);
+        return $this->hasManyThrough(Comment::class, Post::class);
+    }
+
+    public function likes()
+    {
+        return $this->hasManyThrough(Like::class, Post::class);
+    }
+
+    public function commentLikes()
+    {
+        return $this->hasManyThrough(Like::class, Comment::class);
     }
 }
