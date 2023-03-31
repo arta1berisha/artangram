@@ -3,16 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use PHPOpenSourceSaver\JWTAuth\Contracts\Providers\Auth;
 
 class FollowController extends Controller
 {
-    public function follow($request, $user)
+ 
+
+    public function follow($request, $user, $follow)
     {
-        if ($request->user()->canFollow($user)) {
+        if($user->is_private) {
+            $follow->follower_id = Auth::user()->id;
+            $follow->status = 'pending';
+            $follow->save();
+
+            return response()->json(['message' => 'Your request to follow this user is now pending.'], 200);
+        } else if ($request->user()->canFollow($user)) {
             $request->user()->following()->attach($user);
             return response()->json(['message' => 'You are now following them'], 200);
-        }
-
+        } 
         return response()->json(['message' => 'Unable to follow user'], 403);
     }
 
