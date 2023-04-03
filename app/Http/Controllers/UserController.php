@@ -6,9 +6,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\User\UserResource;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Traits\APIResponseTrait;
 
 class UserController extends Controller
 {
+
+    use APIResponseTrait;
+    
     public function index()
     {
         $users = User::paginate();
@@ -30,15 +34,9 @@ class UserController extends Controller
     public function delete(User $user)
     {
         if ($user->delete()) {
-            return response()->json([
-                'status' => true,
-                'message' => 'User deleted Successfully',
-            ], 204);
+            return $this->deleteUserSuccessResponse();
         }
 
-        return response()->json([
-            'status' => false,
-            'message' => 'Cannot delete User',
-        ], 400);
+        return $this->deleteUserErrorResponse();
     }
 }
