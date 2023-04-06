@@ -33,22 +33,18 @@ Route::group(['middleware' => ['auth.jwt']], function () {
 
 
     Route::post('/users/{user}', [FollowController::class, 'follow']); //follow a user
-    Route::post('/pending/followers/{follower}', [FollowController::class, 'handleFollowerActions']);
+    Route::post('/requests/{follower}', [FollowController::class, 'handleFollowerActions']);
 
-    // Route::get('/users/{user}/followers', [
-    //     FollowController::class, 'followers']); //others followers
-    // Route::get('/followers', [
-    //     FollowController::class, 'followers'
-    // ]); //my followers
-    // Route::get('/followings', 'FollowController@followings'); //my followings
+    Route::get('/{user}/followers', [FollowController::class, 'othersFollowers']); //others followers
+    Route::get('/followers', [FollowController::class, 'listFollowers']); //my followers
+    Route::get('/followings', [FollowController::class, 'listFollowings']); //my followings
+    Route::delete('/users/{user}', [FollowController::class, 'unfollow']); //unfollow a user
 
-    // Route::delete('/users/{user}', 'FollowController@unfollow'); //unfollow a user
-
-    // Route::get('/users/{user}/posts', 'PostController@index');
-    // Route::post('/users/{user}/posts', 'PostController@create');
-    // Route::get('/users/{user}/posts/{post}', 'PostController@show');
-    // Route::put('/posts/{post}', 'PostController@update');
-    // Route::delete('/posts/{post}', 'PostController@index');
+    Route::get('/{user}/posts', [PostController::class, 'index']);
+    Route::post('/post', [PostController::class, 'create']);
+    Route::get('/{user}/{post}', [PostController::class, 'show']);
+    Route::put('/posts/{post}', [PostController::class, 'update']);
+    Route::delete('/posts/{post}', [PostController::class, 'delete']);
 
     // Route::get('/posts/{post}/comments', 'CommentController@index');
     // Route::post('/posts/{post}/comments', 'CommentController@create');
