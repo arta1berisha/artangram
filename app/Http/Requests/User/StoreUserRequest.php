@@ -45,6 +45,10 @@ class StoreUserRequest extends FormRequest
                 'max:255',
                 'min:7'
             ],
+            'is_private' => [
+                'required',
+                'boolean'
+            ],
         ];
     }
 }
