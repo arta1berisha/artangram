@@ -6,13 +6,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\User\UserResource;
 use App\Http\Requests\User\UpdateUserRequest;
-use App\Traits\APIResponseTrait;
 
 class UserController extends Controller
 {
-
-    use APIResponseTrait;
-    
     public function index()
     {
         $users = User::paginate();
@@ -38,5 +34,11 @@ class UserController extends Controller
         }
 
         return $this->deleteUserErrorResponse();
+    }
+
+    public function follow(Request $request, User $user)
+    {
+
+        $user->followers()->attach(auth()->user()->id);
     }
 }
