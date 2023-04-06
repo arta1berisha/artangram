@@ -56,7 +56,6 @@ class FollowController extends Controller
 
         if ($request->status === "Accepted") {
 
-
             return response()->json(['message' => 'Your request to follow this user has been accepted']);
         } else if ($request->status === "Rejected")
 
@@ -68,13 +67,13 @@ class FollowController extends Controller
         return response()->json(['message' => 'Unfollowed successfully'], 200);
     }
 
-    public function followers(User $user)
+    public function listFollowers(User $user)
     {
         $followers = $user->followers;
         return response()->json(['followers' => $followers], 200);
     }
 
-    public function following(User $user)
+    public function listFollowings(User $user)
     {
         $following = $user->following;
         return response()->json(['following' => $following], 200);

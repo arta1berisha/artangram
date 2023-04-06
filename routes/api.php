@@ -35,9 +35,8 @@ Route::group(['middleware' => ['auth.jwt']], function () {
     Route::post('/users/{user}', [FollowController::class, 'follow']); //follow a user
     Route::post('/requests/{follower}', [FollowController::class, 'handleFollowerActions']);
 
-    Route::get('/{user}/followers', [FollowController::class, 'othersFollowers']); //others followers
-    Route::get('/followers', [FollowController::class, 'listFollowers']); //my followers
-    Route::get('/followings', [FollowController::class, 'listFollowings']); //my followings
+    Route::get('/{user}/followers', [FollowController::class, 'listFollowers']); //my followers
+    Route::get('/{user}/followings', [FollowController::class, 'listFollowings']); //my followings
     Route::delete('/users/{user}', [FollowController::class, 'unfollow']); //unfollow a user
 
     Route::get('/{user}/posts', [PostController::class, 'index']);
