@@ -13,44 +13,43 @@ class PostController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Post::class);
+
         $posts = Post::paginate();
 
         return PostResource::collection($posts);
     }
 
-    public function create(StorePostRequest $request)
+    public function store(StorePostRequest $request)
     {
-        $user = Auth::user();
-        $attributes = $request->attributes;
-        $post = new Post();
-
-        $post->save();
+        $this->authorize('create', Post::class);
+        $post = Post::create($request->validated());
+        return new PostResource($post);
         return response()->json(['success' => true]);
     }
 
     public function show($post)
     {
+        $this->authorize('view', Post::class);
+
         return new PostResource($post);
     }
 
-    public function update(UpdatePostRequest $request, $post)
+    public function update(UpdatePostRequest $request, Post $post)
     {
+        $this->authorize('update', $post);
         $post->update($request->validated());
         return new PostResource($post);
     }
 
-    public function delete($post)
+    public function delete(Post $post)
     {
-        if ($post->delete()) {
-            return response()->json([
-                'status' => true,
-                'message' => 'Post deleted successfully',
-            ], 204);
-        }
+        $this->authorize('delete', Post::class);
+        $post->delete();
 
         return response()->json([
-            'status' => false,
-            'message' => 'Cannot delete post',
-        ], 400);
+            'status' => true,
+            'message' => 'Post deleted successfully',
+        ], 204);
     }
 }
