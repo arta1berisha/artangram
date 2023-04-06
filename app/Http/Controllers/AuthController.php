@@ -5,14 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\AuthLoginRequest;
 use App\Http\Requests\Auth\AuthRegisterRequest;
 use App\Models\User;
-use App\Traits\APIResponseTrait;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-
-    use APIResponseTrait;
     public function register(AuthRegisterRequest $request)
     {
 
@@ -20,26 +15,34 @@ class AuthController extends Controller
             'name' => $request->name,
             'username' => $request->username,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => bcrypt($request->password),
+            'is_private' => $request->is_private,
         ]);
 
-        // $token = Auth::login($user);
-
         $token = auth()->attempt($request->only('email', 'password'));
-        return $this->registerSuccessResponse(['user' => $user, 'token' => $token]);
+        return $this->successResponse([
+            'user' => null,
+            'authorization' => [
+                'token' => $token,
+                'type' => 'bearer',
+            ]
+        ]);
     }
 
     public function login(AuthLoginRequest $request)
     {
-
-        $credentials = $request->only('email', 'password');
-
-        $token = auth()->attempt($credentials);
+        $token = auth()->attempt($request->validated());
         if (!$token) {
-            return $this->loginErrorResponse();
+            return $this->errorResponse();
         }
 
-        $user = Auth::user();
-        return $this->loginSuccessResponse(['user' => $user, 'token' => $token]);
+        $user = auth()->user();
+        return $this->successResponse([
+            'user' => $user,
+            'authorization' => [
+                'token' => $token,
+                'type' => 'bearer',
+            ]
+        ]);
     }
 }
