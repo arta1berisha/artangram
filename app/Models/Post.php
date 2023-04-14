@@ -2,38 +2,38 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Like;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'slug', 'title', 'post_image', 'description'];
+    protected $fillable = [
+        'user_id',
+        'slug',
+        'title',
+        'post_image',
+        'description',
+        'like_id',
+    ];
 
-    public function users()
+
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function posts()
+    public function comments()
     {
-        return $this->belongsTo(Post::class)->orderBy('created_at', 'DESC');
-    }
-    
-    public function comments() 
-    {
-        return $this->hasManyThrough(Comment::class, Post::class);
+        return $this->hasMany(Comment::class);
     }
 
-    public function likes()
+    public function likes(): MorphMany
     {
-        return $this->hasManyThrough(Like::class, Post::class);
-    }
-
-    public function commentLikes()
-    {
-        return $this->hasManyThrough(Like::class, Comment::class);
+        return $this->morphMany(Like::class, 'likeable');
     }
 }

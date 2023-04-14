@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Like;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 
 class Comment extends Model
 {
@@ -21,8 +23,8 @@ class Comment extends Model
         return $this->belongsTo(Post::class);
     }
 
-    public function like(): MorphOne
+    public function likes(): MorphMany
     {
-        return $this->morphOne(Like::class, 'likeable');
+        return $this->morphMany(Like::class, 'likeable');
     }
 }
