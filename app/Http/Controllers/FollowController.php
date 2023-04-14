@@ -17,11 +17,11 @@ class FollowController extends Controller
         if ($user->is_private === 1) {
             $user->followers()->attach(auth()->user()->id, (['status' => 'Pending']));
 
-            return response()->json(['message' => 'Your request to follow this user is pending']);
+            return $this->successResponse('Your request to follow this user is Pending.');
         } else if ($user->is_private === 0) {
             $user->followers()->attach(auth()->user()->id);
 
-            return response()->json(['message' => 'You are now following this user']);
+            return $this->successResponse('You are now following this user');
         }
     }
 
@@ -30,7 +30,7 @@ class FollowController extends Controller
         if (
             $request->status !== "Accepted" && $request->status !== "Rejected"
         ) {
-            return response()->json(['message' => 'The status received is not supported'], 400);
+            return $this->errorResponse('The status received is not supported', 400);
         }
 
         /** @var User */
@@ -52,30 +52,24 @@ class FollowController extends Controller
             ->where('follower_id', $follower->id)
             ->update(['status' => $request->status]);
 
-        return $this->successResponse($result);
-
-        if ($request->status === "Accepted") {
-
-            return response()->json(['message' => 'Your request to follow this user has been accepted']);
-        } else if ($request->status === "Rejected")
-
-            return response()->json(['message' => 'Your request to follow this user has been rejected']);
+        return $this->successResponse($result); //message response 
     }
+
     public function unfollow($request, User $user)
     {
         $request->user()->following()->detach($user);
-        return response()->json(['message' => 'Unfollowed successfully'], 200);
+        return $this->successResponse('Unfollowed successfully', 200);
     }
 
     public function listFollowers(User $user)
     {
         $followers = $user->followers;
-        return response()->json(['followers' => $followers], 200);
+        return $this->successResponse(['followers' => $followers], 200);
     }
 
     public function listFollowings(User $user)
     {
         $following = $user->following;
-        return response()->json(['following' => $following], 200);
+        return $this->successResponse(['following' => $following], 200);
     }
 }

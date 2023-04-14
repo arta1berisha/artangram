@@ -14,7 +14,7 @@ trait ApiResponseTrait
    * @return JsonResponse
    */
 
- 
+
   public function errorResponse($message = '', $errors = [], $code = '')
   {
     return response()->json([
@@ -25,7 +25,7 @@ trait ApiResponseTrait
     ]);
   }
 
-   public function successResponse($data, $message = '', $code = '')
+  public function successResponse($message = '', $code = '', $data='')
   {
     return response()->json([
       'status' => true,

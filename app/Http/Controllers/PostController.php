@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\PostResource;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
+use App\Models\User;
 use PHPOpenSourceSaver\JWTAuth\Contracts\Providers\Auth;
 
 class PostController extends Controller
@@ -17,20 +18,23 @@ class PostController extends Controller
 
         $posts = Post::paginate();
 
+        // select * from posts where exists ( select followers.following_id from followers where posts.user_id = followers.following_id and followers.status = 'Accepted' )
+
         return PostResource::collection($posts);
     }
 
     public function store(StorePostRequest $request)
     {
         $this->authorize('create', Post::class);
-        $post = Post::create($request->validated());
+
+        $post = auth()->user()->posts()->save(new Post($request->validated()));
+
         return new PostResource($post);
-        return response()->json(['success' => true]);
     }
 
-    public function show($post)
+    public function show(Post $post)
     {
-        $this->authorize('view', Post::class);
+        $this->authorize('view', $post);
 
         return new PostResource($post);
     }
@@ -47,9 +51,6 @@ class PostController extends Controller
         $this->authorize('delete', Post::class);
         $post->delete();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Post deleted successfully',
-        ], 204);
+        return $this->successResponse('Post deleted successfully', 204);
     }
 }

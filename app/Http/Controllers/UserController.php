@@ -30,15 +30,14 @@ class UserController extends Controller
     public function delete(User $user)
     {
         if ($user->delete()) {
-            return $this->deleteUserSuccessResponse();
+            return $this->successResponse('User deleted successfully', 204);
         }
 
-        return $this->deleteUserErrorResponse();
+        return $this->errorResponse();
     }
 
     public function follow(Request $request, User $user)
     {
-
         $user->followers()->attach(auth()->user()->id);
     }
 }
