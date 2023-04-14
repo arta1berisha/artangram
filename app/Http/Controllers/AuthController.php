@@ -21,7 +21,7 @@ class AuthController extends Controller
 
         $token = auth()->attempt($request->only('email', 'password'));
         return $this->successResponse([
-            'user' => null,
+            'user' => $user,
             'authorization' => [
                 'token' => $token,
                 'type' => 'bearer',
