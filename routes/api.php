@@ -1,12 +1,15 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\FollowController;
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\UserController;
+use App\Models\Post;
+use App\Models\Follow;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\Follow;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LikeController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\FollowController;
+use App\Http\Controllers\CommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +27,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/login', 'login');
 });
 
+
 Route::group(['middleware' => ['auth.jwt']], function () {
 
     Route::get('/users', [UserController::class, 'index']);
@@ -31,26 +35,24 @@ Route::group(['middleware' => ['auth.jwt']], function () {
     Route::put('/users/{user}', [UserController::class, 'update']);
     Route::delete('/users/{user}', [UserController::class, 'delete']);
 
-
     Route::post('/users/{user}', [FollowController::class, 'follow']); //follow a user
     Route::post('/requests/{follower}', [FollowController::class, 'handleFollowerActions']);
-
     Route::get('/{user}/followers', [FollowController::class, 'listFollowers']); //my followers
     Route::get('/{user}/followings', [FollowController::class, 'listFollowings']); //my followings
-    Route::delete('/users/{user}', [FollowController::class, 'unfollow']); //unfollow a user
+    Route::delete('/users/{user}/unfollow', [FollowController::class, 'unfollow']); //unfollow a user
 
-    Route::get('/{user}/posts', [PostController::class, 'index']);
-    Route::post('/post', [PostController::class, 'create']);
-    Route::get('/{user}/{post}', [PostController::class, 'show']);
+    Route::get('/posts', [PostController::class, 'index']);
+    Route::post('/posts', [PostController::class, 'store']);
+    Route::get('/posts/{post}', [PostController::class, 'show']);
     Route::put('/posts/{post}', [PostController::class, 'update']);
     Route::delete('/posts/{post}', [PostController::class, 'delete']);
 
-    // Route::get('/posts/{post}/comments', 'CommentController@index');
-    // Route::post('/posts/{post}/comments', 'CommentController@create');
-    // Route::get('/posts/{post}/comments/{comment}', 'CommentController@delete');
+    Route::get('/posts/{post}/comments', [CommentController::class, 'index']);
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store']);
+    Route::delete('/posts/{post}/comments/{comment}', [CommentController::class, 'delete']);
 
-    // Route::post('/users/{user}/posts/{post}/likes', 'LikeController@like');
-    // Route::delete('/users/{user}/posts/{post}/likes', 'LikeController@dislike');
-    // Route::post('/users/{user}/posts/{post}/comments/{comment}/likes', 'LikeController@commentLike');
-    // Route::delete('/users/{user}/posts/{post}/comments/{comment}/likes', 'LikeController@commentDislike');
+    Route::post('/posts/{post}/like', [LikeController::class, 'handlePostLikeActions']);
+    Route::delete('/posts/{post}/like', [LikeController::class, 'handlePostLikeActions']);
+    Route::post('/posts/{post}/comments/{comment}/like', [LikeController::class, 'handleCommentLikeActions']);
+    Route::delete('/posts/{post}/comments/{comment}/like', [LikeController::class, 'handleCommentLikeActions']);
 });
