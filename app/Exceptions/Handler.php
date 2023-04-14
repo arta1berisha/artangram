@@ -42,7 +42,22 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         $this->reportable(function (Throwable $e) {
-            //
+            // dd($e);
+        });
+
+        $this->renderable(function (Throwable $e, $request) {
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return response()->json([
+                    'message' => 'The given data was invalid.',
+                    'errors' => $e->validator->errors()
+                ], 422);
+            } else {
+                $message = $e->getMessage() ?: 'An error occurred.';
+                app('log')->error($message, ['exception' => $e]);
+                return response()->json([
+                    'message' => $message
+                ], 500);
+            }
         });
     }
 }
