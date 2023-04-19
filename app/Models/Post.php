@@ -13,12 +13,10 @@ class Post extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
         'slug',
         'title',
         'post_image',
         'description',
-        'like_id',
     ];
 
 
@@ -35,5 +33,10 @@ class Post extends Model
     public function likes(): MorphMany
     {
         return $this->morphMany(Like::class, 'likeable');
+    }
+
+    public function usersLikes()
+    {
+        return $this->morphToMany(User::class, 'likeable', 'likes');
     }
 }
