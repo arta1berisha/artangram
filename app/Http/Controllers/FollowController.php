@@ -52,10 +52,10 @@ class FollowController extends Controller
             ->where('follower_id', $follower->id)
             ->update(['status' => $request->status]);
 
-        return $this->successResponse($result); //message response 
+        return $this->successResponse('Follow Request Accepted', 200, $result); //message response 
     }
 
-    public function unfollow($request, User $user)
+    public function unfollow(Request $request, User $user)
     {
         $request->user()->following()->detach($user);
         return $this->successResponse('Unfollowed successfully', 200);
