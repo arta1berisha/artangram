@@ -12,13 +12,17 @@ class Like extends Model
 
     protected $fillable = [
         'user_id',
-        'post_id',
-        'comment_id',
-        'likes'
     ];
 
     public function likeable(): MorphTo
     {
         return $this->morphTo();
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+
 }
