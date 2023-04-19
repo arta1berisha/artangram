@@ -17,7 +17,7 @@ class CommentController extends Controller
         return CommentResource::collection($comment);
     }
 
-    public function store(StoreCommentRequest $request, Post $post)
+    public function store(StoreCommentRequest $request, Post $post, Comment $comment)
     {
         $comment = $post->comments()
             ->save(new Comment([
