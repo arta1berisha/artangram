@@ -3,22 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Resources\PostResource;
+use Illuminate\Database\Query\Builder;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
-use App\Models\User;
 use PHPOpenSourceSaver\JWTAuth\Contracts\Providers\Auth;
+use Illuminate\Contracts\Database\Query\Expression;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Post $post, User $following)
     {
         $this->authorize('viewAny', Post::class);
 
-        $posts = Post::paginate();
+        // select * from posts where exists ( select followers.following_id  where posts.user_id = followers.following_id and followers.status = 'Accepted' )
+        $user = auth()->id();
 
-        // select * from posts where exists ( select followers.following_id from followers where posts.user_id = followers.following_id and followers.status = 'Accepted' )
+        $posts = Post::whereHas('user.followers', function ($query) use ($user) {
+            $query->where('following_id', $user)
+                ->where('status', 'Accepted');
+        })
+            ->get();
+        $posts = Post::paginate();
 
         return PostResource::collection($posts);
     }
@@ -48,7 +57,7 @@ class PostController extends Controller
 
     public function delete(Post $post)
     {
-        $this->authorize('delete', Post::class);
+        $this->authorize('delete', $post);
         $post->delete();
 
         return $this->successResponse('Post deleted successfully', 204);
