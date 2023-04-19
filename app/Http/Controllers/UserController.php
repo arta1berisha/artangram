@@ -16,7 +16,7 @@ class UserController extends Controller
         return UserResource::collection($users);
     }
 
-    public function show($user)
+    public function show(User $user)
     {
         return new UserResource($user);
     }
