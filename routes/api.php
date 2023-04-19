@@ -37,9 +37,9 @@ Route::group(['middleware' => ['auth.jwt']], function () {
 
     Route::post('/users/{user}', [FollowController::class, 'follow']); //follow a user
     Route::post('/requests/{follower}', [FollowController::class, 'handleFollowerActions']);
-    Route::get('/{user}/followers', [FollowController::class, 'listFollowers']); //my followers
-    Route::get('/{user}/followings', [FollowController::class, 'listFollowings']); //my followings
-    Route::delete('/users/{user}/unfollow', [FollowController::class, 'unfollow']); //unfollow a user
+    Route::get('/users/{user}/followers', [FollowController::class, 'listFollowers']); //my followers
+    Route::get('/users/{user}/followings', [FollowController::class, 'listFollowings']); //my followings
+    Route::post('/users/{user}/unfollow', [FollowController::class, 'unfollow']); //unfollow a user
 
     Route::get('/posts', [PostController::class, 'index']);
     Route::post('/posts', [PostController::class, 'store']);
@@ -48,11 +48,11 @@ Route::group(['middleware' => ['auth.jwt']], function () {
     Route::delete('/posts/{post}', [PostController::class, 'delete']);
 
     Route::get('/posts/{post}/comments', [CommentController::class, 'index']);
-    Route::post('/posts/{post}/comments', [CommentController::class, 'store']);
+    Route::post('/posts/{post}/comment', [CommentController::class, 'store']);
     Route::delete('/posts/{post}/comments/{comment}', [CommentController::class, 'delete']);
 
     Route::post('/posts/{post}/like', [LikeController::class, 'handlePostLikeActions']);
-    Route::delete('/posts/{post}/like', [LikeController::class, 'handlePostLikeActions']);
+    Route::post('/posts/{post}/unlike', [LikeController::class, 'handlePostUnlikeActions']);
     Route::post('/posts/{post}/comments/{comment}/like', [LikeController::class, 'handleCommentLikeActions']);
-    Route::delete('/posts/{post}/comments/{comment}/like', [LikeController::class, 'handleCommentLikeActions']);
+    Route::post('/posts/{post}/comments/{comment}/unlike', [LikeController::class, 'handleCommentUnlikeActions']);
 });

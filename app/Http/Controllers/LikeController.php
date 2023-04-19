@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Like\LikeCommentRequest;
+use App\Http\Requests\Like\LikePostRequest;
 use App\Http\Resources\Comment\CommentResource;
+use App\Http\Resources\Like\LikeCollection;
+use App\Http\Resources\Like\LikeResource;
 use App\Models\Like;
 use App\Models\Post;
 use App\Models\User;
@@ -12,34 +16,74 @@ use App\Http\Resources\PostResource;
 
 class LikeController extends Controller
 {
-    public function handlePostLikeActions(Like $like, Post $post, User $user)
+    public function handlePostLikeActions(Post $post)
     {
-        $post = new PostResource($post);
         $user = auth()->user();
 
-        $post->likes()->create([
-            'user_id' => $user->id,
-        ]);
+        if ($post->likes()
+            ->where('user_id', $user->id)
+            ->exists()
+        ) {
+            return $this->errorResponse('You already liked this post!');
+        }
 
-        $count = $post->likes()->count();
-        return $count;
+        $post->likes()->create(['user_id' => $user->id]);
+
+        $post->usersLikes()->get();
+
+        return $this->successResponse('You liked this post :)', 200, $post);
     }
 
-
-    public function handleCommentLikeActions(Comment $comment, User $user, Like $like)
+    public function handlePostUnlikeActions( Post $post, User $user)
     {
-        $comments = new CommentResource($comment);
         $user = auth()->user();
 
-        $comments->likes()->create([
-            'user_id' => $user->id,
-        ]);
+        if ($post->likes()
+            ->where('user_id', $user->id)
+            ->exists()
+        ) {
+            $post->likes()->delete(['user_id' => $user]);
 
-        $count = $comments->likes()->count();
-        return $count;
+            $post->usersLikes()->get();
+
+            return $this->successResponse('You unliked this post :(', 203, $post);
+        }
+
+        return $this->errorResponse('Action unsuccessful', [], 404);
     }
 
-    public function commentDislike()
+    public function handleCommentLikeActions(Post $post, Comment $comment, User $user)
     {
+        $user = auth()->user();
+
+        if ($comment->likes()
+            ->where('user_id', $user->id)
+            ->exists()
+        ) {
+            return $this->errorResponse('You already liked this comment!');
+        }
+
+        $comment->likes()->create(['user_id' => $user->id]);
+
+        $comment->usersLikes()->get();
+
+        return $this->successResponse('You liked this comment :)', 200, $comment);
+    }
+
+    public function handleCommentUnlikeActions(Post $post, Comment $comment, User $user)
+    {
+        $user = auth()->user();
+
+        if ($comment->likes()
+            ->where('user_id', $user->id)
+            ->exists()
+        ) {
+            $comment->likes()->delete(['user_id' => $user->id]);
+
+            $comment->usersLikes()->get();
+
+            return $this->successResponse('You unliked this comment :(', 200, $comment);
+        }
+        return $this->errorResponse('Action unsuccessful', [], 404);
     }
 }
