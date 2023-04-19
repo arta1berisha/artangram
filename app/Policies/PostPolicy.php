@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Access\Response;
 
 class PostPolicy
@@ -22,6 +23,14 @@ class PostPolicy
      */
     public function viewAny(User $user): bool
     {
+        // return  $posts = Post::whereExists(function ($query) {
+        //     $query->select(DB::raw(1))
+        //           ->from('followers')
+        //           ->whereRaw('posts.user_id', '=', 'followers.following_id')
+        //           ->where('followers.status', '=', 'Accepted');
+        // })
+        // ->exists();;
+
         return true;
     }
 
@@ -35,6 +44,10 @@ class PostPolicy
             ->where('status', 'Accepted')
             ->where('following_id', $post->user_id)
             ->exists();
+        //   /** @var User */
+        //   $following = auth()->user()->following_id;
+
+        // return $user->id === $following->$post->user_id;
     }
 
     /**
@@ -58,7 +71,6 @@ class PostPolicy
      */
     public function delete(User $user, Post $post): bool
     {
-
         return $user->id === $post->user_id;
     }
 
