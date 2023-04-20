@@ -4,11 +4,14 @@ namespace App\Policies;
 
 use App\Models\Post;
 use App\Models\User;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Access\Response;
 
 class PostPolicy
 {
+    use ApiResponseTrait;
+
     public function before(User $user, string $ability): bool|null
     {
         if ($user->isAdmin()) {
@@ -39,15 +42,15 @@ class PostPolicy
      */
     public function view(User $user, Post $post): bool
     {
-        return $user
+        if (
+            $user
             ->following()
             ->where('status', 'Accepted')
             ->where('following_id', $post->user_id)
-            ->exists();
-        //   /** @var User */
-        //   $following = auth()->user()->following_id;
-
-        // return $user->id === $following->$post->user_id;
+            ->exists()
+        ) {
+            return true;
+        } return false;
     }
 
     /**
