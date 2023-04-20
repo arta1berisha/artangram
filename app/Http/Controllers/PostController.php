@@ -15,20 +15,18 @@ use Illuminate\Contracts\Database\Query\Expression;
 
 class PostController extends Controller
 {
-    public function index(Post $post, User $following)
+    public function index(Post $post, User $user)
     {
         $this->authorize('viewAny', Post::class);
 
-        // select * from posts where exists ( select followers.following_id  where posts.user_id = followers.following_id and followers.status = 'Accepted' )
+       // select * from posts where exists ( select followers.following_id  where posts.user_id  = auth user = followers.following_id and followers.status = 'Accepted' )
         $user = auth()->id();
 
-        $posts = Post::whereHas('user.followers', function ($query) use ($user) {
-            $query->where('following_id', $user)
-                ->where('status', 'Accepted');
+        $posts = Post::whereHas('user.followers', function ($query) {
+            $query->where('follower_id', auth()->id());
         })
-            ->get();
-        $posts = Post::paginate();
-
+        ->get();
+        
         return PostResource::collection($posts);
     }
 
